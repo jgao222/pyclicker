@@ -11,7 +11,7 @@ import pynput
 from pyclick import TIME_LAST
 # from threading import Timer, active_count
 
-CPS = 20
+CPS = 10
 CLICK_INTERVAL_SECONDS = 1 / CPS
 
 # CLICK_INTERVAL_MS = 1000 / CPS
