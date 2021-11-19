@@ -23,7 +23,7 @@ KEY_R = pynput.keyboard.KeyCode.from_char("r")
 
 CLICK_COUNTER = 0
 SECONDS_COUNTER = 0
-TIME_LAST = time.time()
+TIME_LAST = time.perf_counter()
 
 pyautogui.PAUSE = 0
 
@@ -83,11 +83,11 @@ def main():
       pyautogui.click()
 
       CLICK_COUNTER += 1
-      cur_time = time.time()
+      cur_time = time.perf_counter()
       if TIME_LAST:
         SECONDS_COUNTER += cur_time - TIME_LAST
       TIME_LAST = cur_time
-      print(f"clicked at {CLICK_COUNTER} / {SECONDS_COUNTER} Clicks per sec")
+      # print(f"clicked at {CLICK_COUNTER} / {SECONDS_COUNTER} Clicks per sec")
       adjust_speed()
       time.sleep(CLICK_INTERVAL_SECONDS)
     else:
