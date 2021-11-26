@@ -7,9 +7,9 @@ the biggest factor in making it work.
 import time
 import pyautogui
 import pynput
+from tkinter import *
+from tkinter import ttk
 
-from pyclick import TIME_LAST
-# from threading import Timer, active_count
 
 CPS = 10
 CLICK_INTERVAL_SECONDS = 1 / CPS
@@ -19,7 +19,9 @@ RUNNING = True
 MOUSE_CONTROLLER = pynput.mouse.Controller()
 ACTIVE = False
 
-KEY_R = pynput.keyboard.KeyCode.from_char("r")
+# also see https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/key-names.html
+KEY_R = 'r' # this is redundant with tkinter, but was useful for pynputs
+
 
 CLICK_COUNTER = 0
 SECONDS_COUNTER = 0
@@ -27,19 +29,14 @@ TIME_LAST = time.perf_counter()
 
 pyautogui.PAUSE = 0
 
-def on_press(key):
+def handle_key(event):
   global RUNNING
-  # print(key == KEY_R)
+
   print("key was pressed")
-  if key == pynput.keyboard.Key.esc:
-    # print("exiting")
-    # quit()
-    RUNNING = False
-    return False
-  elif key == KEY_R:
-    # print("nop")
+  print(event.keysym)
+  key = event.keysym
+  if key == KEY_R:
     toggle_clicking()
-  return True
 
 def on_click(x, y, button, pressed):
   # print(x, y, button, pressed)
@@ -48,7 +45,7 @@ def on_click(x, y, button, pressed):
 
 
 def toggle_clicking():
-  # print("clicking toggled")
+  print("clicking toggled")
   global ACTIVE
   ACTIVE = not ACTIVE
 
@@ -75,6 +72,19 @@ def print_debug():
 def main():
   global CLICK_COUNTER, SECONDS_COUNTER
   global TIME_LAST
+
+  root = Tk()
+  root.title("pyclick")
+
+  main_frame = ttk.Frame(root)
+  label = Label(main_frame, text=str(ACTIVE))
+  label.pack()
+
+  root.bind("<KeyPress>", handle_key)
+  root.bind("<Escape", root.destroy)
+
+  root.mainloop()
+
   kb_listener = pynput.keyboard.Listener(on_press=on_press)
   kb_listener.start()
 
