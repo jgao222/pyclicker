@@ -1,12 +1,15 @@
 """
-This approach uses threading and appears to be limited to a max of 8 CPS,
-despite the threading.Timer intervals being set to ridiculously short intervals.
+This approach uses a constant main loop and sleeping, no threads. It is simpler
+and works better than the other version. Disabling the pyautogui pause time was
+the biggest factor in making it work.
 """
 # import sys
 import time
 import pyautogui
 import pynput
-from threading import Timer
+
+from pyclick import TIME_LAST
+# from threading import Timer, active_count
 
 CPS = 10
 CLICK_INTERVAL_SECONDS = 1 / CPS
@@ -17,19 +20,21 @@ MOUSE_CONTROLLER = pynput.mouse.Controller()
 ACTIVE = False
 
 KEY_R = pynput.keyboard.KeyCode.from_char("r")
-TIME_LAST = time.time()
 
 CLICK_COUNTER = 0
 SECONDS_COUNTER = 0
+TIME_LAST = time.perf_counter()
 
-pyautogui.PAUSE = 0 # it seems any amount of pause time messes up the rates
+pyautogui.PAUSE = 0
 
 def on_press(key):
+  global RUNNING
   # print(key == KEY_R)
   print("key was pressed")
   if key == pynput.keyboard.Key.esc:
     # print("exiting")
     # quit()
+    RUNNING = False
     return False
   elif key == KEY_R:
     # print("nop")
@@ -44,42 +49,23 @@ def on_click(x, y, button, pressed):
 
 def toggle_clicking():
   # print("clicking toggled")
-  global TIME_LAST
-  global TIMER_GLOBAL
   global ACTIVE
-  if ACTIVE:
-    ACTIVE = False
-  else:
-    ACTIVE = True
-    TIME_LAST = time.time()
-    do_click()
-    # print("should have started clicking")
+  ACTIVE = not ACTIVE
 
 
-def do_click():
-  global TIME_LAST
+def adjust_speed():
   global CLICK_COUNTER, SECONDS_COUNTER
   global CLICK_INTERVAL_SECONDS
-  # print(ACTIVE)
-  if ACTIVE:
-    pyautogui.click()
-    CLICK_COUNTER += 1
-    cur_time = time.time()
-    delta = cur_time - TIME_LAST
-    SECONDS_COUNTER += delta
-    true_cps = CLICK_COUNTER / SECONDS_COUNTER
-    # print(delta - CLICK_INTERVAL_SECONDS)
-    print(f"{true_cps} < {CPS}")
-    if true_cps < CPS: # automatic speed up if we are behind on speed
+
+  if CLICK_COUNTER and SECONDS_COUNTER:
+    if (CLICK_COUNTER / SECONDS_COUNTER) < CPS:
       CLICK_INTERVAL_SECONDS /= 2
     else:
       CLICK_INTERVAL_SECONDS = 1 / CPS
-    print(f"CLICK INTERVAL: {CLICK_INTERVAL_SECONDS}")
-    t = Timer(CLICK_INTERVAL_SECONDS, do_click)
-    t.daemon = True
-    t.start()
-    TIME_LAST = time.time()
-  # print("done click")
+
+  if CLICK_COUNTER > 63:
+    CLICK_COUNTER = 0
+    SECONDS_COUNTER = 0
 
 
 def print_debug():
@@ -88,18 +74,25 @@ def print_debug():
 
 def main():
   global CLICK_COUNTER, SECONDS_COUNTER
+  global TIME_LAST
   kb_listener = pynput.keyboard.Listener(on_press=on_press)
-  # ms_listener = pynput.mouse.Listener(on_click=on_click)e
   kb_listener.start()
-  # ms_listener.start()
 
-  while kb_listener.running:
-    # may limit the clicking speed
-    if CLICK_COUNTER >= 64:
-      CLICK_COUNTER %= 64
-      SECONDS_COUNTER = 0
-    time.sleep(1) # keep the program alive b/c i don't know otherwise how
-    # print("heartbeat")
+  while RUNNING:
+    if ACTIVE:
+      pyautogui.click()
+
+      CLICK_COUNTER += 1
+      cur_time = time.perf_counter()
+      if TIME_LAST:
+        SECONDS_COUNTER += cur_time - TIME_LAST
+      TIME_LAST = cur_time
+      # print(f"clicked at {CLICK_COUNTER} / {SECONDS_COUNTER} Clicks per sec")
+      adjust_speed()
+      time.sleep(CLICK_INTERVAL_SECONDS)
+    else:
+      TIME_LAST = 0
+
   kb_listener.stop()
 
 
