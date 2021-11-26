@@ -7,7 +7,7 @@ the biggest factor in making it work.
 import time
 import pyautogui
 import pynput
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 
 
@@ -20,23 +20,62 @@ MOUSE_CONTROLLER = pynput.mouse.Controller()
 ACTIVE = False
 
 # also see https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/key-names.html
-KEY_R = 'r' # this is redundant with tkinter, but was useful for pynputs
-
+KEY_R = pynput.keyboard.KeyCode.from_char("r")
 
 CLICK_COUNTER = 0
 SECONDS_COUNTER = 0
 TIME_LAST = time.perf_counter()
 
+CLICK_COUNT = 0
+
+
 pyautogui.PAUSE = 0
 
-def handle_key(event):
+def init_gui():
+  main_frame = ttk.Frame(root)
+  label = tk.Label(main_frame, text="text")
+  label.pack()
+
+  button = tk.Button(main_frame, text="click me!", command=update_score)
+  button.pack()
+
+  clicks_label = tk.Label(main_frame, textvariable=COUNT_VAR)
+  clicks_label.pack()
+
+  main_frame.pack()
+
+
+def init_bindings():
+  # we need to use pynput listener b/c tkinter only listens for inputs when focused on root
+  kb_listener = pynput.keyboard.Listener(on_press=handle_key)
+  kb_listener.start()
+  # root.bind("<KeyPress>", handle_key)
+  # root.bind("<Escape>", handle_quit)
+
+
+def handle_key(key):
   global RUNNING
 
   print("key was pressed")
-  print(event.keysym)
-  key = event.keysym
+  # print(event.keysym)
+  # key = event.keysym
   if key == KEY_R:
     toggle_clicking()
+  elif key == pynput.keyboard.Key.esc:
+    handle_quit()
+
+
+def handle_quit():
+  # root.destroy()
+  global RUNNING
+  RUNNING = False
+
+
+def update_score():
+  global CLICK_COUNT
+  CLICK_COUNT += 1
+  COUNT_VAR.set(CLICK_COUNT)
+
 
 def on_click(x, y, button, pressed):
   # print(x, y, button, pressed)
@@ -48,6 +87,23 @@ def toggle_clicking():
   print("clicking toggled")
   global ACTIVE
   ACTIVE = not ACTIVE
+
+
+def do_clicking():
+  global CLICK_COUNTER, TIME_LAST, SECONDS_COUNTER
+  if ACTIVE:
+    pyautogui.click()
+
+    CLICK_COUNTER += 1
+    cur_time = time.perf_counter()
+    if TIME_LAST:
+      SECONDS_COUNTER += cur_time - TIME_LAST
+    TIME_LAST = cur_time
+    # print(f"clicked at {CLICK_COUNTER} / {SECONDS_COUNTER} Clicks per sec")
+    adjust_speed()
+    time.sleep(CLICK_INTERVAL_SECONDS)
+  else:
+    TIME_LAST = 0 # on last call of this function, reset time_last value
 
 
 def adjust_speed():
@@ -69,42 +125,18 @@ def print_debug():
   print("debug")
 
 
-def main():
-  global CLICK_COUNTER, SECONDS_COUNTER
-  global TIME_LAST
+root = tk.Tk()
+root.title("pyclick")
 
-  root = Tk()
-  root.title("pyclick")
+COUNT_VAR = tk.StringVar()
 
-  main_frame = ttk.Frame(root)
-  label = Label(main_frame, text=str(ACTIVE))
-  label.pack()
+init_gui()
+init_bindings()
 
-  root.bind("<KeyPress>", handle_key)
-  root.bind("<Escape", root.destroy)
-
-  root.mainloop()
-
-  kb_listener = pynput.keyboard.Listener(on_press=on_press)
-  kb_listener.start()
-
-  while RUNNING:
-    if ACTIVE:
-      pyautogui.click()
-
-      CLICK_COUNTER += 1
-      cur_time = time.perf_counter()
-      if TIME_LAST:
-        SECONDS_COUNTER += cur_time - TIME_LAST
-      TIME_LAST = cur_time
-      # print(f"clicked at {CLICK_COUNTER} / {SECONDS_COUNTER} Clicks per sec")
-      adjust_speed()
-      time.sleep(CLICK_INTERVAL_SECONDS)
-    else:
-      TIME_LAST = 0
-
-  kb_listener.stop()
+# root.mainloop()
+while RUNNING:
+  root.update_idletasks() # this is why we can't just * import
+  root.update()
+  do_clicking()
 
 
-if __name__ == "__main__":
-  main()
