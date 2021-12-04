@@ -5,22 +5,24 @@ the biggest factor in making it work.
 """
 # import sys
 import time
+from tkinter.constants import HORIZONTAL
 import pyautogui
 import pynput
 import tkinter as tk
 from tkinter import ttk
 
 
-CPS = 10
-CLICK_INTERVAL_SECONDS = 1 / CPS
+DEFAULT_CPS = 10
 
-# CLICK_INTERVAL_MS = 1000 / CPS
-RUNNING = True
 MOUSE_CONTROLLER = pynput.mouse.Controller()
-ACTIVE = False
 
 # also see https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/key-names.html
 KEY_R = pynput.keyboard.KeyCode.from_char("r")
+
+pyautogui.PAUSE = 0
+
+root = tk.Tk()
+root.title("pyclick")
 
 CLICK_COUNTER = 0
 SECONDS_COUNTER = 0
@@ -28,18 +30,39 @@ TIME_LAST = time.perf_counter()
 
 CLICK_COUNT = 0
 
+CPS = DEFAULT_CPS
+CPS_text = tk.StringVar()
+CPS_text.set(DEFAULT_CPS)
+CLICK_INTERVAL_SECONDS = 1 / CPS
+# CLICK_INTERVAL_MS = 1000 / CPS
 
-pyautogui.PAUSE = 0
+
+RUNNING = True
+ACTIVE = False
+
+ACTIVE_STRING = "Active"
+NOT_ACTIVE_STRING = "Currently Not Active"
+ACTIVE_TEXT = tk.StringVar()
+ACTIVE_TEXT.set(NOT_ACTIVE_STRING)
+
+PRECISION = 1
+
+UPDATE_TEXT_FLAG = False # because we want to update text on callback, but tkinter doesn't like that
+                         # since pynput listeners and callbacks run in their own thread
 
 def init_gui():
   main_frame = ttk.Frame(root)
-  label = tk.Label(main_frame, text="text")
+  active_label = ttk.Label(main_frame, textvariable=ACTIVE_TEXT)
+  active_label.pack()
+
+  label = ttk.Label(main_frame, text="CPS (Rate)")
   label.pack()
 
-  button = tk.Button(main_frame, text="click me!", command=update_score)
-  button.pack()
+  slider = ttk.Scale(main_frame, orient=HORIZONTAL, length=500, command=update_cps, from_=0.1, to=50.0)
+  slider.set(DEFAULT_CPS)
+  slider.pack()
 
-  clicks_label = tk.Label(main_frame, textvariable=COUNT_VAR)
+  clicks_label = ttk.Label(main_frame, textvariable=CPS_text)
   clicks_label.pack()
 
   main_frame.pack()
@@ -51,6 +74,8 @@ def init_bindings():
   kb_listener.start()
   # root.bind("<KeyPress>", handle_key)
   # root.bind("<Escape>", handle_quit)
+  root.protocol("WM_DELETE_WINDOW", handle_quit) # end tcustom mainloop when press close btn
+
 
 
 def handle_key(key):
@@ -71,10 +96,14 @@ def handle_quit():
   RUNNING = False
 
 
-def update_score():
-  global CLICK_COUNT
-  CLICK_COUNT += 1
-  COUNT_VAR.set(CLICK_COUNT)
+def update_cps(click_speed=DEFAULT_CPS):
+  global CPS
+  # print(type(click_speed))
+  click_speed = round(float(click_speed), PRECISION)
+  CPS_text.set(str(click_speed))
+  CPS = click_speed
+  # CLICK_COUNT += 1
+  # COUNT_VAR.set(CLICK_COUNT)
 
 
 def on_click(x, y, button, pressed):
@@ -85,8 +114,17 @@ def on_click(x, y, button, pressed):
 
 def toggle_clicking():
   print("clicking toggled")
-  global ACTIVE
+  global ACTIVE, UPDATE_TEXT_FLAG
   ACTIVE = not ACTIVE
+
+  UPDATE_TEXT_FLAG = True
+
+
+def update_texts():
+  if ACTIVE:
+    ACTIVE_TEXT.set(ACTIVE_STRING)
+  else:
+    ACTIVE_TEXT.set(NOT_ACTIVE_STRING)
 
 
 def do_clicking():
@@ -125,17 +163,17 @@ def print_debug():
   print("debug")
 
 
-root = tk.Tk()
-root.title("pyclick")
-
-COUNT_VAR = tk.StringVar()
+# COUNT_VAR = tk.StringVar()
 
 init_gui()
 init_bindings()
 
 # root.mainloop()
 while RUNNING:
-  root.update_idletasks() # this is why we can't just * import
+  if UPDATE_TEXT_FLAG:
+    update_texts()
+    UPDATE_TEXT_FLAG = False
+  root.update_idletasks()
   root.update()
   do_clicking()
 
