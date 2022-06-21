@@ -1,44 +1,84 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter.constants import HORIZONTAL, VERTICAL
+from tkinter.constants import VERTICAL
 
 # local imports
 import consts
 
 
-def init_gui(root):
-    """
-    initialize tkinter GUI
-    args
-      root: a root (`tk.Tk()`) to put the elements into
-    returns
-      the frame that got initialized
-    """
-    main_frame = ttk.Frame(root, padding=(30, 12, 30, 12))
+class MainGui(tk.Frame):
+    def __init__(self, parent):
+        root = parent
+        super().__init__(root)
+        # main_frame = ttk.Frame(root, padding=(30, 12, 30, 12))
 
-    ACTIVE_TEXT = tk.StringVar(master=root, name="ACTIVE_DISPLAY")
-    ACTIVE_TEXT.set(consts.NOT_ACTIVE_STRING)
+        self._ACTIVE_TEXT = tk.StringVar(master=root, name="ACTIVE_DISPLAY")
+        self._ACTIVE_TEXT.set(consts.NOT_ACTIVE_STRING)
 
-    active_label = ttk.Label(main_frame, textvariable=ACTIVE_TEXT)
-    active_label.grid(row=0, column=0, columnspan=2)
+        active_label = ttk.Label(self, textvariable=self._ACTIVE_TEXT)
+        active_label.grid(row=0, column=0, columnspan=2, pady="0 20", sticky="nw")
 
-    CPS_text = tk.StringVar(master=root, name="CPS_DISPLAY")
-    CPS_text.set("CPS (Rate): " + str(consts.DEFAULT_CPS))
+        self._CPS_TEXT = tk.StringVar(master=root, name="CPS_DISPLAY")
+        self._CPS_TEXT.set("CPS (Rate): " + str(consts.DEFAULT_CPS))
 
-    clicks_label = ttk.Label(main_frame, textvariable=CPS_text)
-    clicks_label.grid(row=1, column=0, columnspan=2)
-    slider = ttk.Scale(
-        main_frame,
-        orient=VERTICAL,
-        length=500,
-        # command=update_cps,
-        name="cps_adjust_slider",
-        from_=0.1,
-        to=50.0,
-        #  tickinterval=10.0
-    )
-    slider.set(consts.DEFAULT_CPS)
-    slider.grid(row=2, column=0, rowspan=5)
-    main_frame.grid(row=0, column=0)
+        clicks_label = ttk.Label(self, textvariable=self._CPS_TEXT)
+        clicks_label.grid(row=1, column=0, columnspan=2)
 
-    return (main_frame, {"cps_text": CPS_text, "active_text": ACTIVE_TEXT})
+        self._CPS_SCALE_VALUE = tk.DoubleVar()
+        self._CPS_SCALE_VALUE.set(consts.DEFAULT_CPS)
+        slider = ttk.Scale(
+            self,
+            orient=VERTICAL,
+            length=500,
+            # make sure to configure callback for this in outside code
+            name="cps_adjust_slider",
+            from_=50.0,
+            to=1.0,
+            variable=self._CPS_SCALE_VALUE,
+            command=self.update_cps
+            # not supported on ttk.scale
+            #  tickinterval=10.0
+        )
+        slider.grid(row=2, column=0, rowspan=5, columnspan=2)
+
+        self.grid(row=0, column=0, sticky="nsw", padx="15 15", pady="20 20")
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        # put externally visible variables into a map
+        self._externally_visible_variables = {
+            "cps_text": self._CPS_TEXT,
+            "active_text": self._ACTIVE_TEXT,
+            "cps_scale_value": self._CPS_SCALE_VALUE
+        }
+
+        # listeners for updates to the cps value
+        self._cps_listeners = list()
+
+
+    def get_vars(self):
+        """
+        Please don't modify the map returned by this function!
+        """
+        return self._externally_visible_variables
+
+
+    def update_cps(self):
+        cps_val = self._CPS_SCALE_VALUE.get()
+        self._CPS_TEXT.set("CPS (Rate): " + str(cps_val))
+        for listener in self._cps_listeners:
+            listener.update_cps(cps_val)
+
+
+    def subscribe_cps_listener(self, listener):
+        """
+        A listener to the cps value from the scale on this object
+        should have an update_cps method accepting one value
+        which is the new cps to update to
+        """
+        self._cps_listeners.append(listener)
+
+
+    def set_active_text(self, text):
+        self._ACTIVE_TEXT.set(text)

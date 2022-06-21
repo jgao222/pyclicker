@@ -9,11 +9,11 @@ import time
 import pyautogui
 import pynput
 import tkinter as tk
-from tkinter import ttk
 
 # local imports
 import gui.gui as gui
 import consts
+import clicker
 
 # global variables
 MOUSE_CONTROLLER = pynput.mouse.Controller()
@@ -33,7 +33,7 @@ CPS = consts.DEFAULT_CPS
 CLICK_INTERVAL_SECONDS = 1 / CPS
 # CLICK_INTERVAL_MS = 1000 / CPS
 
-RUNNING = True
+PROGRAM_RUNNING = True
 ACTIVE = False
 
 
@@ -49,7 +49,7 @@ def init_bindings(root):
 
 
 def handle_key(key):
-    global RUNNING
+    global PROGRAM_RUNNING
 
     print("key was pressed")
     # print(event.keysym)
@@ -62,18 +62,8 @@ def handle_key(key):
 
 def handle_quit():
     # root.destroy()
-    global RUNNING
-    RUNNING = False
-
-
-def update_cps(display_var, click_speed=consts.DEFAULT_CPS):
-    global CPS
-    # print(type(click_speed))
-    click_speed = round(float(click_speed), consts.ROUND_PRECISION)
-    display_var.set(str(click_speed))
-    CPS = click_speed
-    # CLICK_COUNT += 1
-    # COUNT_VAR.set(CLICK_COUNT)
+    global PROGRAM_RUNNING
+    PROGRAM_RUNNING = False
 
 
 def on_click(x, y, button, pressed):
@@ -90,11 +80,11 @@ def toggle_clicking():
     UPDATE_TEXT_FLAG = True
 
 
-def update_texts(active_text):
+def update_texts(ui):
     if ACTIVE:
-        active_text.set(consts.ACTIVE_STRING)
+        ui.set_active_text(consts.ACTIVE_STRING)
     else:
-        active_text.set(consts.NOT_ACTIVE_STRING)
+        ui.set_active_text(consts.NOT_ACTIVE_STRING)
 
 
 def do_clicking():
@@ -136,23 +126,21 @@ def print_debug():
 def main():
     # root.mainloop()
     root = tk.Tk()
+    # root.geometry("400x600")
+    root.resizable(False, False)
     root.title("pyclick")
-    ui, tk_vars = gui.init_gui(root)
-    # need to configure the scale to call the handler for it
-    display_var = tk_vars["cps_text"]
-    cps_slider = ui.children["cps_adjust_slider"]
-    cps_slider.configure(command=lambda _: update_cps(display_var, cps_slider.get()))
-
-    active_text_var = tk_vars["active_text"]
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
+    ui = gui.MainGui(root)
 
     init_bindings(root)
 
     # because we want to update text on callback, but tkinter doesn't like that
     # since pynput listeners and callbacks run in their own thread
     UPDATE_TEXT_FLAG = False
-    while RUNNING:
+    while PROGRAM_RUNNING:
         if UPDATE_TEXT_FLAG:
-            update_texts(active_text_var)
+            update_texts(ui)
             UPDATE_TEXT_FLAG = False
         root.update_idletasks()
         root.update()
