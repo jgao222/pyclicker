@@ -50,7 +50,7 @@ class MainGui(tk.Frame):
         self._externally_visible_variables = {
             "cps_text": self._CPS_TEXT,
             "active_text": self._ACTIVE_TEXT,
-            "cps_scale_value": self._CPS_SCALE_VALUE
+            "cps_scale_value": self._CPS_SCALE_VALUE,
         }
 
         # listeners for updates to the cps value
@@ -64,8 +64,8 @@ class MainGui(tk.Frame):
         return self._externally_visible_variables
 
 
-    def update_cps(self):
-        cps_val = self._CPS_SCALE_VALUE.get()
+    def update_cps(self, new_cps):
+        cps_val = round(float(new_cps), consts.ROUND_PRECISION)
         self._CPS_TEXT.set("CPS (Rate): " + str(cps_val))
         for listener in self._cps_listeners:
             listener.update_cps(cps_val)
