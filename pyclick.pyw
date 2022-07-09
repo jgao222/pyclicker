@@ -21,10 +21,6 @@ pyautogui.PAUSE = 0  # we want to go fast
 
 # global variables
 
-# also see https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/key-names.html
-KEY_R = pynput.keyboard.KeyCode.from_char("r")
-KEY_ESC = pynput.keyboard.Key.esc
-
 PROGRAM_RUNNING = True
 
 LAST_KEY = None
@@ -68,11 +64,8 @@ def handle_quit():
     PROGRAM_RUNNING = False
 
 
-def update_texts(ui, active):
-    if active:
-        ui.set_active_text(consts.ACTIVE_STRING)
-    else:
-        ui.set_active_text(consts.NOT_ACTIVE_STRING)
+def update_texts(ui: gui.MainGui, active):
+    ui.respond_event("active_change", active)
 
 
 def print_debug():
@@ -92,9 +85,9 @@ def main():
 
     clickerObject = clicker.Clicker()
     clickerObject.add_callback_to_active_change(lambda state: update_texts(ui, state))
-    ui.subscribe_cps_listener(clickerObject)
+    ui.add_event_callback("cps_change", clickerObject.update_cps)
 
-    bindings = {KEY_R: clickerObject.toggle_clicking, KEY_ESC: handle_quit}
+    bindings = {consts.KEY_R: clickerObject.toggle_clicking, consts.KEY_ESC: handle_quit}
 
     init_bindings(root)
     init_kb_listener()

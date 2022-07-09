@@ -21,6 +21,7 @@ class Clicker:
 
 
     def update_cps(self, click_speed=consts.DEFAULT_CPS):
+        # this version of update (overloaded) is to update on the cps_change event
         # rounding now handled in gui, value out of that is already rounded
         # click_speed = round(float(click_speed), consts.ROUND_PRECISION)
         self._cps = click_speed
