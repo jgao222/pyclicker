@@ -8,7 +8,7 @@ class Slider(tk.Frame):
     """
     Wrapper class for a slider with a display of its current value
     """
-    def __init__(self, parent):
+    def __init__(self, parent, start: float, end: float):
         super().__init__(parent)
 
         self._callback = None
@@ -29,8 +29,8 @@ class Slider(tk.Frame):
             length=500,
             # make sure to configure callback for this in outside code
             name="cps_adjust_slider",
-            from_=50.0,
-            to=1.0,
+            from_=end,
+            to=start,
             variable=self._CPS_SCALE_VALUE,
             command=self._update,
             # not supported on ttk.scale

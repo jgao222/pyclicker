@@ -26,12 +26,13 @@ class MainGui(tk.Frame):
             ("active_change", list())
         ])
 
-        # main_frame = ttk.Frame(root, padding=(30, 12, 30, 12))
+        # a label indicating if the clicker is active or not
         active_label = activity_label.ActivityLabel(self)
         self._event_listeners["active_change"].append(active_label.update)
         active_label.grid(row=0, column=0, columnspan=2, pady="0 20", sticky="nw")
 
-        self._slider = slider.Slider(self)
+        # a slider with a label showing its current value
+        self._slider = slider.Slider(self, 0.1, 50)
         self._slider.set_callback(lambda new_cps: self.emit_event("cps_change", new_cps))
         self._slider.grid(row=2, column=0, rowspan=5, columnspan=2)
 
