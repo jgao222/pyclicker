@@ -12,7 +12,7 @@ class ActivityLabel(tk.Frame):
         self._ACTIVE_TEXT.set(consts.NOT_ACTIVE_STRING)
 
         self._label = ttk.Label(self, textvariable=self._ACTIVE_TEXT)
-        self._label.grid(row=0, column=0)
+        self._label.grid(row=0, column=0, sticky="nsew")
 
 
     def update(self, state: bool):

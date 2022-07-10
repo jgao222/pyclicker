@@ -18,6 +18,7 @@ class Clicker:
         self._cps = consts.DEFAULT_CPS
         self._click_interval_seconds = 1 / self._cps
         # CLICK_INTERVAL_MS = 1000 / self._cps
+        self._cur_window = "Anywhere"
 
 
     def update_cps(self, click_speed=consts.DEFAULT_CPS):
@@ -30,6 +31,13 @@ class Clicker:
     def update(self):
         """Update function to be called once every loop of program"""
         self.do_clicking()
+
+
+    def update_window(self, window="Anywhere"):
+        """Change the window to be clicked inside of"""
+        print(f"Clicker got window: {window} to be set to")
+        self._cur_window = window
+        print(f"self._cur_window is now {self._cur_window}")
 
 
     def adjust_speed(self):
@@ -72,4 +80,5 @@ class Clicker:
 
 
     def change_in_active_state(self):
-        self._active_change_callback(self._active)
+        if self._active_change_callback:
+            self._active_change_callback(self._active)

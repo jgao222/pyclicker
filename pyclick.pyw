@@ -81,11 +81,20 @@ def main():
     root.title("pyclick")
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
+
     ui = gui.MainGui(root)
+
+    root.update() # prod it once to fit geometry
+    root.minsize(root.winfo_width(), root.winfo_height()) # set min w/h to initial
 
     clickerObject = clicker.Clicker()
     clickerObject.add_callback_to_active_change(lambda state: update_texts(ui, state))
+
+    # set up events going between
+    # change in ui click speed setting to change the value in the object doing clicking
     ui.add_event_callback("cps_change", clickerObject.update_cps)
+    # change in ui window selection to change the selected window in clicker object
+    ui.add_event_callback("window_change", clickerObject.update_window)
 
     bindings = {consts.KEY_R: clickerObject.toggle_clicking, consts.KEY_ESC: handle_quit}
 
