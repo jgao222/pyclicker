@@ -3,7 +3,6 @@ The main GUI and misc gui elements for the program
 """
 import tkinter as tk
 from tkinter import ttk
-from tkinter.constants import VERTICAL
 
 # local imports
 import gui.activity_label as activity_label
@@ -43,7 +42,7 @@ class MainGui(tk.Frame):
         window_selection = window_selector.WindowSelector(self)
         window_selection.set_callback(lambda new_window:
             self.emit_event("window_change", new_window)
-        ) # TODO propagate selection out to program
+        )
         window_selection.grid(row=0, column=3)
 
         # grid self onto root
@@ -51,13 +50,6 @@ class MainGui(tk.Frame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
-
-
-    def get_vars(self):
-        """
-        Please don't modify the map returned by this function!
-        """
-        return self._externally_visible_variables
 
 
     def emit_event(self, event, value):

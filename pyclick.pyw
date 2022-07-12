@@ -113,6 +113,7 @@ def main():
         root.update_idletasks()
         root.update()
         clickerObject.update()
+        time.sleep(0.01) # sleep for a bit to be lighter on resources
 
 
 if __name__ == "__main__":
