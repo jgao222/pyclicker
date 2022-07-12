@@ -66,8 +66,7 @@ class WindowSelector(tk.Frame):
         # manually put in the anywhere option as the first choice
         tmp_copy = list(self._selection_box["values"])
         tmp_copy.insert(0, "Anywhere")
-        self._selection_box["values"] = tmp_copy
-        # print(self._selection_box["values"]) # TODO print
         self._window_to_hwnd["Anywhere"] = consts.ANYWHERE_HWND
 
+        self._selection_box["values"] = tmp_copy
         self._selected_text.set("Anywhere") # set back to anywhere as default

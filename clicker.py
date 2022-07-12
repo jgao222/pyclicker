@@ -78,16 +78,14 @@ class Clicker:
 
     def should_click(self):
         if self._active:
+            # ideally we just use one expression and short circuit, but this is
+            # clearer, so we can leave it in for now
             click_anywhere = self._cur_window == consts.ANYWHERE_HWND
             foreground_is_selected = win32gui.GetForegroundWindow() == self._cur_window
             cursor_in_selected = point_in_rect(win32gui.GetCursorPos(), win32gui.GetClientRect(self._cur_window))
 
-            # print(f"anywhere: {click_anywhere} | selected window in foreground: {foreground_is_selected} | cursor in window: {cursor_in_selected}")
-
             cursor_in_target = click_anywhere or (foreground_is_selected and cursor_in_selected)
 
-            # print(f"{cursor_in_target} that the cursor is " +
-            #     f"in the target window, it is {cursor_in_target} that we will click")
             if cursor_in_target:
                 return True
         return False
@@ -111,7 +109,6 @@ def point_in_rect(point, rect):
     - point: a point as tuple (x, y)
     - rect: a rectange as tuple (left, top, right, bottom)
     """
-    print(f"point: {point} | rect: {rect}")
     return (
         point[0] >= rect[0] and
         point[0] <= rect[2] and

@@ -59,7 +59,6 @@ def handle_key(key, bindings):
 
 
 def handle_quit():
-    # root.destroy()
     global PROGRAM_RUNNING
     PROGRAM_RUNNING = False
 
@@ -74,9 +73,8 @@ def print_debug():
 
 def main():
     global LAST_KEY_HANDLED
-    # root.mainloop()
+
     root = tk.Tk()
-    # root.geometry("400x600")
     # root.resizable(False, False)
     root.title("pyclick")
     root.columnconfigure(0, weight=1)
