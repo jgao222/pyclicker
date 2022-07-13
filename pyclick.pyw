@@ -33,7 +33,8 @@ def init_bindings(root):
     """
     Initializes some bindings for the main program
     """
-    # we need to use pynput listener b/c tkinter only listens for inputs when focused on root
+    # we need to use pynput listener b/c tkinter only listens for inputs when
+    # focused on its window
     root.protocol(
         "WM_DELETE_WINDOW", handle_quit
     )  # end custom mainloop when press close btn
@@ -78,19 +79,26 @@ def main():
 
     ui = gui.MainGui(root)
 
-    root.update() # prod it once to fit geometry
-    root.minsize(root.winfo_width(), root.winfo_height()) # set min w/h to initial
+    root.update()  # prod it once to fit geometry
+
+    # lock min w/h to initial
+    root.minsize(root.winfo_width(), root.winfo_height())
 
     clickerObject = clicker.Clicker()
-    clickerObject.add_callback_to_active_change(lambda state: update_texts(ui, state))
+    clickerObject.add_callback_to_active_change(
+        lambda state: update_texts(ui, state)
+    )
 
     # set up events going between
-    # change in ui click speed setting to change the value in the object doing clicking
+    # change in ui click speed setting changes the cps in clickerObject
     ui.add_event_callback("cps_change", clickerObject.update_cps)
-    # change in ui window selection to change the selected window in clicker object
+    # change in ui window selection changes the allowed window
     ui.add_event_callback("window_change", clickerObject.update_window)
 
-    bindings = {consts.KEY_R: clickerObject.toggle_clicking, consts.KEY_ESC: handle_quit}
+    bindings = {
+        consts.KEY_R: clickerObject.toggle_clicking,
+        consts.KEY_ESC: handle_quit,
+    }
 
     init_bindings(root)
     init_kb_listener()
@@ -103,11 +111,12 @@ def main():
             handle_key(LAST_KEY, bindings)
             LAST_KEY_HANDLED = True
 
-        # need to split tkinter main loop b/c need to loop the clicker in as well
+        # split tkinter main loop b/c need to loop the clicker in as well
         root.update_idletasks()
         root.update()
         clickerObject.update()
-        time.sleep(0.01) # sleep for a bit to be lighter on resources
+        time.sleep(0.01)  # sleep for a bit to be lighter on resources
+        # note this technically limits the click rate to 100
 
 
 if __name__ == "__main__":
