@@ -21,3 +21,4 @@ If an option other than `"Anywhere"` is selected, the clicker will only click in
 ### Planned Features
 - [ ] Click at a set point on the screen instead of at the cursor
 - [ ] Support rebinding keyboard binds
+- [ ] Minimize to tray
