@@ -1,9 +1,24 @@
-## Clicking script with Python
+## Python Clicking Script
 
-Uses `pynput` for detecting keyboard input and `pyautogui` for sending clicks.
+This is a simple script for an autoclicker, made in Python.
 
-Uses `tkinter` to make a simple gui that displays whether or not the program is active, and has a slider for setting speed.
+It uses `pynput` for detecting keyboard input and `pyautogui` for sending clicks.
 
-Uses `R` key to toggle clicking, `ESC` as a general failsafe to exit the program.
+Also uses `tkinter` to make a simple gui, and `win32api`, `win32gui` from `pywin32`.
 
-CPS can be set from 0.1 to 50 based on a slider in the GUI.
+Currently sets `R` key to toggle clicking, `ESC` as a general failsafe to exit the program.
+
+
+### GUI
+
+The clicking speed (clicks per second) can be set from 0.1 to 50 via the slider, in steps of 0.1
+
+The GUI also supports selecting a specific window that the clicker should be active in.
+
+If an option other than `"Anywhere"` is selected, the clicker will only click in the specified window when that window is focused/in foreground.
+
+
+### Planned Features
+- [ ] Click at a set point on the screen instead of at the cursor
+- [ ] Support rebinding keyboard binds
+- [ ] Minimize to tray
