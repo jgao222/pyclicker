@@ -82,9 +82,13 @@ class Clicker:
             # clearer, so we can leave it in for now
             click_anywhere = self._cur_window == consts.ANYWHERE_HWND
             foreground_is_selected = win32gui.GetForegroundWindow() == self._cur_window
-            cursor_in_selected = point_in_rect(win32gui.GetCursorPos(), win32gui.GetClientRect(self._cur_window))
+            cursor_in_selected = point_in_rect(win32gui.GetCursorPos(), win32gui.GetWindowRect(self._cur_window)) if self._cur_window != -1 else False
+            cursor_in_target = click_anywhere or ( foreground_is_selected and cursor_in_selected )
 
-            cursor_in_target = click_anywhere or (foreground_is_selected and cursor_in_selected)
+            # cursor_in_target = self._cur_window == consts.ANYWHERE_HWND or \
+            #     ((win32gui.GetForegroundWindow() == self._cur_window) and
+            #      (point_in_rect(win32gui.GetCursorPos(), win32gui.GetClientRect(self._cur_window))))
+            print(f"foreground: {foreground_is_selected} | cursor_in: {cursor_in_selected}")
 
             if cursor_in_target:
                 return True
@@ -109,6 +113,7 @@ def point_in_rect(point, rect):
     - point: a point as tuple (x, y)
     - rect: a rectange as tuple (left, top, right, bottom)
     """
+    consts.dprint(f"p: {point}, r: {rect}")
     return (
         point[0] >= rect[0] and
         point[0] <= rect[2] and

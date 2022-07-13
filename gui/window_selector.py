@@ -52,8 +52,16 @@ class WindowSelector(tk.Frame):
 
 
     def refresh_selection_list(self):
+        old_selection = self._selected_text.get()
+        old_hwnd = self._window_to_hwnd[old_selection]
+
         self._selection_box["values"] = ()
         self._window_to_hwnd.clear()
+
+        self._window_to_hwnd[old_selection] = old_hwnd # put the previously selected window back in
+        # this will make it so that if the user doesn't change the selection but the window text
+        # changes, it will still recognize the right thing and have a valid hwnd
+
         def clear_and_get_window_list(hwnd, _ignore):
             if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
                 window_text = win32gui.GetWindowText(hwnd)
@@ -69,4 +77,4 @@ class WindowSelector(tk.Frame):
         self._window_to_hwnd["Anywhere"] = consts.ANYWHERE_HWND
 
         self._selection_box["values"] = tmp_copy
-        self._selected_text.set("Anywhere") # set back to anywhere as default
+        # self._selected_text.set("Anywhere") # set back to anywhere as default
