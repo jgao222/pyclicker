@@ -67,10 +67,6 @@ def update_texts(ui: gui.MainGui, active):
     ui.respond_event("active_change", active)
 
 
-def print_debug():
-    print("debug")
-
-
 def main():
     global LAST_KEY_HANDLED
 

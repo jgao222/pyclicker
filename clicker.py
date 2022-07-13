@@ -88,7 +88,7 @@ class Clicker:
             # cursor_in_target = self._cur_window == consts.ANYWHERE_HWND or \
             #     ((win32gui.GetForegroundWindow() == self._cur_window) and
             #      (point_in_rect(win32gui.GetCursorPos(), win32gui.GetClientRect(self._cur_window))))
-            print(f"foreground: {foreground_is_selected} | cursor_in: {cursor_in_selected}")
+            # print(f"foreground: {foreground_is_selected} | cursor_in: {cursor_in_selected}") TODO: print
 
             if cursor_in_target:
                 return True

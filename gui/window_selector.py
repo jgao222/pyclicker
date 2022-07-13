@@ -53,14 +53,11 @@ class WindowSelector(tk.Frame):
 
     def refresh_selection_list(self):
         old_selection = self._selected_text.get()
-        old_hwnd = self._window_to_hwnd[old_selection]
+        old_hwnd = self._window_to_hwnd[old_selection] if old_selection in self._window_to_hwnd else None
 
         self._selection_box["values"] = ()
         self._window_to_hwnd.clear()
 
-        self._window_to_hwnd[old_selection] = old_hwnd # put the previously selected window back in
-        # this will make it so that if the user doesn't change the selection but the window text
-        # changes, it will still recognize the right thing and have a valid hwnd
 
         def clear_and_get_window_list(hwnd, _ignore):
             if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
@@ -71,10 +68,16 @@ class WindowSelector(tk.Frame):
         win32gui.EnumWindows(clear_and_get_window_list, None)
         self._selection_box["values"] = sorted(list(self._window_to_hwnd.keys()))
 
+        if old_hwnd:
+            self._window_to_hwnd[old_selection] = old_hwnd # put the previously selected window back in
+        # this will make it so that if the user doesn't change the selection but the window text
+        # changes, it will still recognize the right thing and have a valid hwnd
+        # has to be done after the list of options is updated to not have it be in the list (a window
+        # with it's text does not exist anymore)
+
         # manually put in the anywhere option as the first choice
         tmp_copy = list(self._selection_box["values"])
         tmp_copy.insert(0, "Anywhere")
         self._window_to_hwnd["Anywhere"] = consts.ANYWHERE_HWND
 
         self._selection_box["values"] = tmp_copy
-        # self._selected_text.set("Anywhere") # set back to anywhere as default
