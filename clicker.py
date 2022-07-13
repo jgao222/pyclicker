@@ -18,7 +18,6 @@ class Clicker:
 
         self._cps = consts.DEFAULT_CPS
         self._click_interval_seconds = 1 / self._cps
-        # CLICK_INTERVAL_MS = 1000 / self._cps
         self._cur_window = consts.ANYWHERE_HWND
 
     def update_cps(self, click_speed=consts.DEFAULT_CPS):
