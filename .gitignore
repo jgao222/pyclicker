@@ -1,0 +1,6 @@
+__pycache__/
+build/
+dist/
+pyclick.spec
+test/
+.vscode
