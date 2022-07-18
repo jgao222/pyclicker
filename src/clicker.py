@@ -20,6 +20,10 @@ class Clicker:
         self._click_interval_seconds = 1 / self._cps
         self._cur_window = consts.ANYWHERE_HWND
 
+        # for clicking at set point
+        self._click_at_point = False
+        self._point_to_click = (None, None)
+
     def update_cps(self, click_speed=consts.DEFAULT_CPS):
         self._cps = click_speed
 
@@ -29,10 +33,16 @@ class Clicker:
 
     def update_window(self, window=consts.ANYWHERE_HWND):
         """Change the window to be clicked inside of"""
-        print(f"Clicker got window: {window} to be set to")
+        consts.dprint(f"Clicker got window: {window}", 1)
         self._cur_window = window
-        print("self._cur_window is now " +
-              f"{win32gui.GetWindowText(self._cur_window)}")
+        consts.dprint("Clicker window is now " +
+                      f"{win32gui.GetWindowText(self._cur_window)}", 1)
+
+    def update_click_point(self, to_click=False, target_point=(None, None)):
+        self._point_to_click = target_point
+        self._click_at_point = to_click
+        consts.dprint("Updated point to click at to be:" +
+                      f"{self._point_to_click}")
 
     def adjust_speed(self):
         if self._click_counter and self._seconds_counter:
@@ -73,14 +83,21 @@ class Clicker:
             click_anywhere = self._cur_window == consts.ANYWHERE_HWND
             foreground_is_selected = (win32gui.GetForegroundWindow() ==
                                       self._cur_window)
-            cursor_in_selected = (
-                point_in_rect(
-                    win32gui.GetCursorPos(),
-                    win32gui.GetWindowRect(self._cur_window)
-                )
-                if self._cur_window != -1
-                else False
-            )
+            cursor_in_selected = None
+            if self._cur_window != consts.ANYWHERE_HWND:
+                if self._click_at_point:
+                    cursor_in_selected = point_in_rect(
+                        (self._point_to_click[0], self._point_to_click[1]),
+                        win32gui.GetWindowRect(self._cur_window)
+                    )
+                else:
+                    cursor_in_selected = point_in_rect(
+                        win32gui.GetCursorPos(),
+                        win32gui.GetWindowRect(self._cur_window)
+                    )
+            else:
+                cursor_in_selected = True
+
             cursor_in_target = click_anywhere or (
                 foreground_is_selected and cursor_in_selected
             )

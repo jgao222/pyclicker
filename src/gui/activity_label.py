@@ -3,7 +3,7 @@ from tkinter import ttk
 import consts
 
 
-class ActivityLabel(tk.Frame):
+class ActivityLabel(ttk.LabelFrame):
     """
     A label showing the activity/state of something
     """  # specific purpose object, could be generalized later
@@ -14,11 +14,13 @@ class ActivityLabel(tk.Frame):
         self._ACTIVE_TEXT.set(consts.NOT_ACTIVE_STRING)
 
         self._label = ttk.Label(self, textvariable=self._ACTIVE_TEXT,
-                                background="grey80",
                                 foreground=consts.NOT_ACTIVE_COLOR)
         # place instead of grid to center for some reason doesn't compute
         # the height correctly, and results in needing magic numbers to offset
-        self._label.place(relx=0.5, rely=0.5, anchor="center")
+        # self._label.place(relx=0.5, rely=0.5, anchor="center")
+        self._label.grid(row=0, column=0, pady="0 10")
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
 
     def update(self, state: bool):
         """

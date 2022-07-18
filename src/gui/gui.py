@@ -24,7 +24,7 @@ class MainGui(tk.Frame):
         self._event_listeners = dict([("active_change", list())])
 
         # a label indicating if the clicker is active or not
-        active_label = activity_label.ActivityLabel(self, bg="grey80")
+        active_label = activity_label.ActivityLabel(self, text="Clicker State")
         self._event_listeners["active_change"].append(active_label.update)
         active_label.grid(row=0, column=0,
                           columnspan=2, pady="0 20", sticky="NSEW")

@@ -29,5 +29,5 @@ DEBUG_LEVEL = 0  # -1 for no debugging
 
 
 def dprint(string: str, level: int = 0):
-    if level < DEBUG_LEVEL:
+    if level <= DEBUG_LEVEL:
         print(string)
