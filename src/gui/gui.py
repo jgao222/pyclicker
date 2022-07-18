@@ -2,6 +2,7 @@
 The main GUI and misc gui elements for the program
 """
 import tkinter as tk
+from tkinter import ttk
 
 # local imports
 import gui.activity_label as activity_label
@@ -23,10 +24,15 @@ class MainGui(tk.Frame):
         self._event_listeners = dict([("active_change", list())])
 
         # a label indicating if the clicker is active or not
-        active_label = activity_label.ActivityLabel(self)
+        active_label = activity_label.ActivityLabel(self, bg="grey80")
         self._event_listeners["active_change"].append(active_label.update)
         active_label.grid(row=0, column=0,
-                          columnspan=2, pady="0 20", sticky="")
+                          columnspan=2, pady="0 20", sticky="NSEW")
+        # force an update in order to lock it at the first dims it gets
+        self.update()
+        active_label.configure(width=active_label.winfo_width(),
+                               height=active_label.winfo_height() + 35)
+        # yes that's a magic number, gah
 
         # a slider with a label showing its current value
         self._slider = slider.Slider(self, 0.1, 50)
@@ -34,6 +40,10 @@ class MainGui(tk.Frame):
             lambda new_cps: self.emit_event("cps_change", new_cps)
         )
         self._slider.grid(row=2, column=0, rowspan=5, columnspan=2)
+
+        # a separator to divide the slider from window selector
+        sep2 = ttk.Separator(self, orient="vertical")
+        sep2.grid(column=2, row=0, rowspan=9, sticky="ns", padx="20 0")
 
         # a dropdown (combobox) showcasing open windows
         window_selection = window_selector.WindowSelector(self)

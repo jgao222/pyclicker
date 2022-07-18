@@ -1,3 +1,4 @@
+import re
 import tkinter as tk
 from tkinter import ttk
 from tkinter.constants import VERTICAL
@@ -12,14 +13,27 @@ class Slider(tk.Frame):
     def __init__(self, parent, start: float, end: float):
         super().__init__(parent)
 
+        self._start = start
+        self._end = end
+
         self._callback = None
         self._cps_val = consts.DEFAULT_CPS
 
-        self._VALUE_TEXT = tk.StringVar(master=parent, name="CPS_DISPLAY")
-        self._VALUE_TEXT.set("CPS (Rate): " + str(consts.DEFAULT_CPS))
+        label = ttk.Label(self, text="CPS (Rate): ")
+        label.grid(row=0, column=0, pady="0 10")
 
-        cps_entry = ttk.Entry(self, textvariable=self._CPS_TEXT)
-        cps_entry.grid(row=0, column=0, columnspan=2, pady="0 10")
+        self._VALUE_TEXT = tk.StringVar(master=parent, name="CPS_DISPLAY")
+        self._VALUE_TEXT.set(str(consts.DEFAULT_CPS))
+        # self._VALUE_TEXT.trace_add("write", self._handle_text_update)
+
+        check_valid_wrapper = (self.register(self.check_valid), '%P', '%V')
+        cps_entry = ttk.Entry(self, textvariable=self._VALUE_TEXT, width=5,
+                              validate="all",
+                              validatecommand=check_valid_wrapper)
+        cps_entry.bind("<Return>",
+                       lambda _:
+                       self.check_valid(self._VALUE_TEXT.get(), "focusout"))
+        cps_entry.grid(row=0, column=1, pady="0 10")
 
         self._VALUE = tk.DoubleVar()
         self._VALUE.set(consts.DEFAULT_CPS)
@@ -41,9 +55,23 @@ class Slider(tk.Frame):
 
     def _update(self, cps):
         cps_val = round(float(cps), consts.ROUND_PRECISION)
-        self._CPS_TEXT.set("CPS (Rate): " + str(cps_val))
+        self._VALUE_TEXT.set(str(cps_val))
+        self._VALUE.set(cps_val)
         if self._callback:
             self._callback(cps_val)
+
+    def _handle_text_update(self):
+        val = None
+        try:
+            val = float(self._VALUE_TEXT.get())
+            if val > self._end or val < self._start:
+                if val > self._end:
+                    val = self._end
+                elif val < self._start:
+                    val = self._start
+            self._update(val)
+        except ValueError:
+            self._update(self._VALUE.get())
 
     def set_callback(self, callback):
         """
@@ -52,3 +80,23 @@ class Slider(tk.Frame):
         - callback: a function which takes 1 argument, the value of the slider
         """
         self._callback = callback
+
+    def check_valid(self, newval, op):
+        print("hello", op)
+        if op == 'key':
+            ok_so_far = re.match('^[0-9]*.?[0-9]?$', newval) is not None \
+                and len(newval) <= 5
+            return ok_so_far
+        elif op == 'focusout':
+            val = None
+            try:
+                val = float(newval)
+            except ValueError:
+                print("Non float entry")
+            except TypeError:
+                print("TypeError: This shouldn't happen!")
+            valid = val is not None
+            if valid:
+                self._handle_text_update()
+            return valid
+        return True  # catch-all

@@ -73,7 +73,7 @@ def main():
 
     root = tk.Tk()
     # root.resizable(False, False)
-    root.title("pyclick")
+    root.title(consts.WINDOW_NAME)
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
 

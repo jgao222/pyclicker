@@ -1,9 +1,13 @@
 import pynput
 
-DEFAULT_CPS = 10
+WINDOW_NAME = "pyclick"
+
+DEFAULT_CPS = 10.0
 ROUND_PRECISION = 1  # round to one decimal place
-ACTIVE_STRING = "Currently Active"
-NOT_ACTIVE_STRING = "Currently Not Active"
+ACTIVE_STRING = "Active"
+ACTIVE_COLOR = "green"
+NOT_ACTIVE_STRING = "Not Active"
+NOT_ACTIVE_COLOR = "red"
 
 # pynput key constants
 # see https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/key-names.html
@@ -15,6 +19,7 @@ KEY_ESC = pynput.keyboard.Key.esc
 WINDOWS_TO_FILTER = set([
     "Microsoft Text Input Application",
     "Program Manager",
+    "pyclick",  # don't click in self
 ])
 
 # mock hwnd to represent clicking anywhere
