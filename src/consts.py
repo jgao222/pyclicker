@@ -23,6 +23,6 @@ ANYWHERE_HWND = -1  # assuming no actual window takes on hwnd of -1
 DEBUG_LEVEL = 0  # -1 for no debugging
 
 
-def dprint(string, level=0):
+def dprint(string: str, level: int = 0):
     if level < DEBUG_LEVEL:
         print(string)
