@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-import win32gui
+import win32.win32gui as win32gui
 import consts
 
 

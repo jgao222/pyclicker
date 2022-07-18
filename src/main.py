@@ -9,6 +9,7 @@ import time
 import pyautogui
 import pynput
 import tkinter as tk
+import sv_ttk  # theme
 
 # local imports
 import gui.gui as gui
@@ -72,6 +73,8 @@ def main():
     global LAST_KEY_HANDLED
 
     root = tk.Tk()
+    sv_ttk.set_theme("light")
+
     # root.resizable(False, False)
     root.title(consts.WINDOW_NAME)
     root.columnconfigure(0, weight=1)

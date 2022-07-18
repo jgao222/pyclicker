@@ -1,6 +1,6 @@
 import pyautogui
 import time
-import win32gui
+import win32.win32gui as win32gui
 
 # local imports
 import consts
