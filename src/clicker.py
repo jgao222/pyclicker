@@ -84,6 +84,8 @@ class Clicker:
             cursor_in_target = click_anywhere or (
                 foreground_is_selected and cursor_in_selected
             )
+            self_focused = win32gui.GetWindowText(
+                win32gui.GetForegroundWindow()) == consts.WINDOW_NAME
 
             # cursor_in_target = self._cur_window == consts.ANYWHERE_HWND or \
             #     ((win32gui.GetForegroundWindow() == self._cur_window) and
@@ -94,8 +96,7 @@ class Clicker:
                           f"cursor_in: {cursor_in_selected}",
                           1)
 
-            if cursor_in_target:
-                return True
+            return cursor_in_target and not self_focused
         return False
 
     # these two methods send events outward
