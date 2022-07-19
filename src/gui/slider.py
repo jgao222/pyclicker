@@ -54,11 +54,17 @@ class Slider(tk.Frame):
             # not supported on ttk.scale
             #  tickinterval=10.0
         )
+
+        def override_leftclick(event):  # change left click to jump instantly
+            self._slider.event_generate("<Button-3>", x=event.x, y=event.y)
+            return "break"
+        self._slider.bind("<Button-1>", override_leftclick)
         self._slider.grid(row=1, column=0, rowspan=5, columnspan=2)
 
     def _update(self, cps):
+        consts.dprint("update called", 2)
         cps_val = round(float(cps), consts.ROUND_PRECISION)
-        self._VALUE.set(cps_val)
+        self._VALUE_TEXT.set(str(cps_val))  # set the visible entry text
         if self._callback:
             self._callback(cps_val)
 

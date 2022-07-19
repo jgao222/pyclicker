@@ -97,6 +97,7 @@ def main():
     ui.add_event_callback("cps_change", clickerObject.update_cps)
     # change in ui window selection changes the allowed window
     ui.add_event_callback("window_change", clickerObject.update_window)
+    # TODO add position change
 
     bindings = {
         consts.KEY_R: clickerObject.toggle_clicking,
