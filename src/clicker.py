@@ -38,7 +38,7 @@ class Clicker:
         consts.dprint("Clicker window is now " +
                       f"{win32gui.GetWindowText(self._cur_window)}", 1)
 
-    def update_click_point(self, to_click=False, target_point=(None, None)):
+    def update_click_point(self, target_point=(None, None)):
         """
         Update the click point
         @args
@@ -46,9 +46,9 @@ class Clicker:
         - target_point: a tuple (x, y) screen coordinates point to click at
         """
         self._point_to_click = target_point
-        self._click_at_point = to_click
-        consts.dprint("Updated point to click at to be:" +
-                      f"{self._point_to_click}")
+        self._click_at_point = target_point[0] and target_point[1]
+        consts.dprint("Updated point to click at to be: " +
+                      f"{self._point_to_click}", 2)
 
     def adjust_speed(self):
         if self._click_counter and self._seconds_counter:

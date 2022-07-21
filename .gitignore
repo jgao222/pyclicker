@@ -4,3 +4,4 @@ dist/
 pyclick.spec
 test/
 .vscode
+tmp/

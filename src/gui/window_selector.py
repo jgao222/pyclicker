@@ -16,7 +16,7 @@ class WindowSelector(tk.Frame):
         super().__init__(parent)
 
         self._title = ttk.Label(self, text="Click in:")
-        self._title.grid(row=0, column=0, padx="20 5")
+        self._title.grid(row=0, column=0, padx="0 5")
 
         self._selected_text = tk.StringVar()
         self._selected_text.set("Anywhere")

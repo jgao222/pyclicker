@@ -82,6 +82,14 @@ def main():
 
     ui = gui.MainGui(root)
 
+    # this is a hack to make entries play nicer/more as expected
+    # so that focusout events will happen when user clicks out of an entry
+    def try_focus(e):
+        try:
+            e.widget.focus()
+        except Exception:
+            pass
+    root.bind_all("<Button-1>", try_focus)
     root.update()  # prod it once to fit geometry
 
     # lock min w/h to initial
@@ -97,7 +105,8 @@ def main():
     ui.add_event_callback("cps_change", clickerObject.update_cps)
     # change in ui window selection changes the allowed window
     ui.add_event_callback("window_change", clickerObject.update_window)
-    # TODO add position change
+    # add position change
+    ui.add_event_callback("click_pos_change", clickerObject.update_click_point)
 
     bindings = {
         consts.KEY_R: clickerObject.toggle_clicking,

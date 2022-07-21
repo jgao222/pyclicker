@@ -26,18 +26,14 @@ class Slider(tk.Frame):
 
         self._VALUE_TEXT = tk.StringVar(master=parent, name="CPS_DISPLAY")
         self._VALUE_TEXT.set(str(consts.DEFAULT_CPS))
-        # self._VALUE_TEXT.trace_add("write", self._handle_text_update)
 
         check_valid_wrapper = (self.register(self.check_valid), '%P', '%V')
         self._cps_entry = ttk.Entry(
             self, textvariable=self._VALUE_TEXT, width=5,
             validate="all",
             validatecommand=check_valid_wrapper)
-        self._cps_entry.bind("<Return>",
-                             lambda _:
-                             self.check_valid(
-                                self._VALUE_TEXT.get(), "focusout"
-                             ))
+        self._cps_entry.bind("<FocusOut>", self._revalidate)
+        self._cps_entry.bind("<Return>", self._revalidate)
         self._cps_entry.grid(row=0, column=1, pady="0 10")
 
         self._VALUE = tk.DoubleVar()
@@ -46,7 +42,7 @@ class Slider(tk.Frame):
         self._slider = ttk.Scale(
             self,
             orient=VERTICAL,
-            length=500,
+            length=600,
             # make sure to configure callback for this in outside code
             name="cps_adjust_slider",
             from_=end,
@@ -66,13 +62,15 @@ class Slider(tk.Frame):
     def _update(self, cps, update_text=True):
         consts.dprint("update called", 2)
         cps_val = round(float(cps), consts.ROUND_PRECISION)
-        if update_text:
+        if update_text:  # it's an update to the text
             self._VALUE_TEXT.set(str(cps_val))  # set the visible entry text
-        self._cps_entry.state(["!invalid"])
+            self._cps_entry.state(["!invalid"])
+        else:  # it's an update to the slider
+            self._VALUE.set(cps_val)
         if self._callback:
             self._callback(cps_val)
 
-    def _handle_text_update(self):
+    def _revalidate(self, *args):
         tval = None
         try:
             tval = float(self._VALUE_TEXT.get())
@@ -81,9 +79,11 @@ class Slider(tk.Frame):
                     tval = self._end
                 elif tval < self._start:
                     tval = self._start
+            self._VALUE_TEXT.set(f"{tval:.1f}")  # in case clamping changed it
             self._update(tval, False)
         except ValueError:
             self._VALUE_TEXT(str(self._VALUE.get()))
+        self._cps_entry.state(["!invalid"])
 
     def set_callback(self, callback):
         """
@@ -108,6 +108,4 @@ class Slider(tk.Frame):
             except TypeError:
                 print("TypeError: This shouldn't happen!")
             valid = val is not None
-            self._handle_text_update()
-        self._cps_entry.state(["!invalid"] if valid else ["invalid"])
         return valid

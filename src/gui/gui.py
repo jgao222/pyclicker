@@ -8,6 +8,7 @@ from tkinter import ttk
 import gui.activity_label as activity_label
 import gui.slider as slider
 import gui.window_selector as window_selector
+import gui.point_selector as point_selector
 
 
 class MainGui(tk.Frame):
@@ -17,14 +18,19 @@ class MainGui(tk.Frame):
 
         # listeners for internal events going outwards
         self._event_callbacks = dict(
-            [("cps_change", list()), ("window_change", list())]
+            [
+                ("cps_change", list()),
+                ("window_change", list()),
+                ("click_pos_change", list()),
+            ]
         )
 
         # listeners for external events coming in
         self._event_listeners = dict([("active_change", list())])
 
         # a label indicating if the clicker is active or not
-        active_label = activity_label.ActivityLabel(self, text="Clicker State")
+        active_label = activity_label.ActivityLabel(
+            self, text=" Clicker State ")
         self._event_listeners["active_change"].append(active_label.update)
         active_label.grid(row=0, column=0,
                           columnspan=2, pady="0 20", sticky="NSEW")
@@ -39,11 +45,11 @@ class MainGui(tk.Frame):
         self._slider.set_callback(
             lambda new_cps: self.emit_event("cps_change", new_cps)
         )
-        self._slider.grid(row=2, column=0, rowspan=5, columnspan=2)
+        self._slider.grid(row=1, column=0, rowspan=5, columnspan=2)
 
         # a separator to divide the slider from window selector
         sep2 = ttk.Separator(self, orient="vertical")
-        sep2.grid(column=2, row=0, rowspan=9, sticky="ns", padx="20 0")
+        sep2.grid(column=2, row=0, rowspan=9, sticky="ns", padx="20 20")
 
         # a dropdown (combobox) showcasing open windows
         window_selection = window_selector.WindowSelector(self)
@@ -51,6 +57,16 @@ class MainGui(tk.Frame):
             lambda new_window: self.emit_event("window_change", new_window)
         )
         window_selection.grid(row=0, column=3)
+
+        # the options for that frame
+        self._point_selection = point_selector.PointSelector(
+            self,
+            text=" Click at "
+        )
+        self._point_selection.set_callback(
+            lambda new_point: self.emit_event("click_pos_change", new_point)
+        )
+        self._point_selection.grid(row=1, column=3, sticky="nsew")
 
         # grid self onto root
         self.grid(row=0, column=0, sticky="nsw", padx="15 15", pady="20 20")
