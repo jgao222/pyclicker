@@ -39,6 +39,12 @@ class Clicker:
                       f"{win32gui.GetWindowText(self._cur_window)}", 1)
 
     def update_click_point(self, to_click=False, target_point=(None, None)):
+        """
+        Update the click point
+        @args
+        - to_click: whether to click at a set point
+        - target_point: a tuple (x, y) screen coordinates point to click at
+        """
         self._point_to_click = target_point
         self._click_at_point = to_click
         consts.dprint("Updated point to click at to be:" +
@@ -57,7 +63,8 @@ class Clicker:
 
     def do_clicking(self):
         if self.should_click():
-            pyautogui.click()
+            pyautogui.click(x=self._point_to_click[0],
+                            y=self._point_to_click[1])
 
             self._click_counter += 1
             cur_time = time.perf_counter()
@@ -109,9 +116,9 @@ class Clicker:
             #      (point_in_rect(win32gui.GetCursorPos(),
             #                     win32gui.GetClientRect(self._cur_window))))
             # TODO: print statement
-            consts.dprint(f"foreground: {foreground_is_selected} |" +
+            consts.dprint(f"foreground: {foreground_is_selected} | " +
                           f"cursor_in: {cursor_in_selected}",
-                          1)
+                          3)
 
             return cursor_in_target and not self_focused
         return False

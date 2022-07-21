@@ -53,7 +53,7 @@ def set_last_key(key):
 
 
 def handle_key(key, bindings):
-    print(f"key was pressed: {key}")
+    consts.dprint(f"key was pressed: {key}", 2)
     # use custom bindings method instead of tkinter's since it works better
     # to capture input, as pynput listener operates in own thread
     if key in bindings:

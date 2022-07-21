@@ -9,6 +9,8 @@ import consts
 class Slider(tk.Frame):
     """
     Wrapper class for a slider with a display of its current value
+    @callback
+    - calls its callback with an updated value of cps rounded to nearest tenth
     """
     def __init__(self, parent, start: float, end: float):
         super().__init__(parent)
@@ -61,10 +63,12 @@ class Slider(tk.Frame):
         self._slider.bind("<Button-1>", override_leftclick)
         self._slider.grid(row=1, column=0, rowspan=5, columnspan=2)
 
-    def _update(self, cps):
+    def _update(self, cps, update_text=True):
         consts.dprint("update called", 2)
         cps_val = round(float(cps), consts.ROUND_PRECISION)
-        self._VALUE_TEXT.set(str(cps_val))  # set the visible entry text
+        if update_text:
+            self._VALUE_TEXT.set(str(cps_val))  # set the visible entry text
+        self._cps_entry.state(["!invalid"])
         if self._callback:
             self._callback(cps_val)
 
@@ -77,7 +81,7 @@ class Slider(tk.Frame):
                     tval = self._end
                 elif tval < self._start:
                     tval = self._start
-            self._update(tval)
+            self._update(tval, False)
         except ValueError:
             self._VALUE_TEXT(str(self._VALUE.get()))
 
@@ -90,6 +94,7 @@ class Slider(tk.Frame):
         self._callback = callback
 
     def check_valid(self, newval, op):
+        consts.dprint(f"called check_valid: {newval}, {op}")
         valid = False
         if op == 'key' or op == 'focusin':
             valid = re.match('^[0-9]*.?[0-9]?$', newval) is not None \

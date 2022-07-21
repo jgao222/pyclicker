@@ -25,7 +25,7 @@ WINDOWS_TO_FILTER = set([
 # mock hwnd to represent clicking anywhere
 ANYWHERE_HWND = -1  # assuming no actual window takes on hwnd of -1
 
-DEBUG_LEVEL = 0  # -1 for no debugging
+DEBUG_LEVEL = 2  # -1 for no debugging
 
 
 def dprint(string: str, level: int = 0):
