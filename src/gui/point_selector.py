@@ -6,7 +6,7 @@ from ast import literal_eval
 import consts
 
 
-class PointSelector(ttk.LabelFrame):
+class PointSelector(ttk.Frame):
     """
     Selector for specific point to click at
     @callback
@@ -16,16 +16,20 @@ class PointSelector(ttk.LabelFrame):
         super().__init__(master, **kwargs)
         self._callback = None
 
+        # a label to indicate the option
+        click_label = ttk.Label(self, text="Click at: ")
+        click_label.grid(row=0, column=0, sticky="w", padx="0 0")
+
         self._mode = tk.StringVar()
         self._mode.set("CURSOR")
         # radio between clicking at cursor and at set point
-        cursor_option = ttk.Radiobutton(self, text="At cursor",
+        cursor_option = ttk.Radiobutton(self, text="Cursor",
                                         variable=self._mode, value="CURSOR")
-        point_option = ttk.Radiobutton(self, text="At point",
+        point_option = ttk.Radiobutton(self, text="Set Point",
                                        variable=self._mode, value="POINT")
-        cursor_option.grid(row=0, column=0, sticky="w",
+        cursor_option.grid(row=1, column=0, sticky="w",
                            padx="40 0", pady="5 0")
-        point_option.grid(row=1, column=0, sticky="w", padx="40 0")
+        point_option.grid(row=2, column=0, sticky="w", padx="40 0")
 
         self._mode.trace_add("write", self.handle_mode_change)
 
@@ -40,7 +44,7 @@ class PointSelector(ttk.LabelFrame):
                                       validate="all",
                                       validatecommand=check_valid_wrapper,
                                       state="disabled")
-        self._COORD_ENTRY.grid(row=2, column=0, pady="0 10", padx="50 5")
+        self._COORD_ENTRY.grid(row=3, column=0, pady="0 10", padx="50 5")
 
     def handle_mode_change(self, *args):
         # surely this is only called after the value is updated right?

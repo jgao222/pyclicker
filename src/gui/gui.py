@@ -51,22 +51,33 @@ class MainGui(tk.Frame):
         sep2 = ttk.Separator(self, orient="vertical")
         sep2.grid(column=2, row=0, rowspan=9, sticky="ns", padx="20 20")
 
+        # labelframe containing options
+        options_frame = ttk.LabelFrame(self, text="Options")
+
         # a dropdown (combobox) showcasing open windows
-        window_selection = window_selector.WindowSelector(self)
+        window_selection = window_selector.WindowSelector(options_frame)
         window_selection.set_callback(
             lambda new_window: self.emit_event("window_change", new_window)
         )
-        window_selection.grid(row=0, column=3)
+        window_selection.grid(row=0, column=0, columnspan=3, padx="20 20",
+                              pady="20 0")
 
-        # the options for that frame
+        # separator to divide window and point selectors
+        sep3 = ttk.Separator(options_frame, orient="horizontal")
+        sep3.grid(row=1, column=0, columnspan=3, padx="20 20", pady="20 20",
+                  sticky="ew")
+
+        # point selector for where to click
         self._point_selection = point_selector.PointSelector(
-            self,
-            text=" Click at "
-        )
+            options_frame,)
         self._point_selection.set_callback(
             lambda new_point: self.emit_event("click_pos_change", new_point)
         )
-        self._point_selection.grid(row=1, column=3, sticky="nsew")
+        self._point_selection.grid(row=2, column=0, padx="20 0", pady="0 20",
+                                   sticky="w")
+        # the minute amount fo padding here prevents drawing over the border
+
+        options_frame.grid(row=0, column=3, rowspan=5, sticky="nsew")
 
         # grid self onto root
         self.grid(row=0, column=0, sticky="nsw", padx="15 15", pady="20 20")
