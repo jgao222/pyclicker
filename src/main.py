@@ -76,8 +76,16 @@ def handle_quit():
     PROGRAM_RUNNING = False
 
 
-def update_texts(ui: gui.MainGui, active):
-    ui.respond_event("active_change", active)
+def watch_next_click(callback):
+    """
+    On the next click, execute the callback
+    @args
+    - callback: a function of the form fn(x, y, button, pressed) where
+                - x, y are screen coordinates, button is which button,
+                  pressed is a boolean representing pressed down or not
+    """
+    listener = pynput.mouse.Listener(on_click=callback)
+    listener.start()
 
 
 def main():
@@ -120,6 +128,10 @@ def main():
     ui.add_event_callback("click_pos_change", clickerObject.update_click_point)
     # lmb or rmb click type change
     ui.add_event_callback("click_type_change", clickerObject.update_click_btn)
+    # request to set click position
+    ui.add_event_callback("request_set_click_position", watch_next_click(
+        lambda x, y, _1, _2: ui.respond_event("set_click_position", (x, y))
+    ))
 
     init_bindings(root, clickerObject)
     init_kb_listener()

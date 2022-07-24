@@ -11,6 +11,8 @@ import gui.window_selector as window_selector
 import gui.point_selector as point_selector
 import gui.button_selector as button_selector
 
+import consts
+
 
 class MainGui(tk.Frame):
     def __init__(self, parent):
@@ -18,22 +20,26 @@ class MainGui(tk.Frame):
         super().__init__(root)
 
         # listeners for internal events going outwards
-        self._event_callbacks = dict(
-            [
-                ("cps_change", list()),
-                ("window_change", list()),
-                ("click_pos_change", list()),
-                ("click_type_change", list()),
-            ]
-        )
-
+        self._event_callbacks = dict([
+            ("cps_change", list()),
+            ("window_change", list()),
+            ("click_pos_change", list()),
+            ("click_type_change", list()),
+            ("request_set_click_position", list())
+        ])
         # listeners for external events coming in
-        self._event_listeners = dict([("active_change", list())])
+        self._event_listeners = dict([
+            ("active_change", list()),
+            ("set_click_position", list()),
+        ])
+        # doing listeners like this is a bit wasteful for space, it might be
+        # better to lazily instantiate them, default to empty dicts, and fill
+        # them in when necessary
 
         # a label indicating if the clicker is active or not
         active_label = activity_label.ActivityLabel(
             self, text=" Clicker State ")
-        self._event_listeners["active_change"].append(active_label.update)
+        self.add_event_handler("active_change", active_label.update)
         active_label.grid(row=0, column=0,
                           columnspan=2, pady="0 20", sticky="NSEW")
         # force an update in order to lock it at the first dims it gets
@@ -103,13 +109,21 @@ class MainGui(tk.Frame):
             for callback in self._event_callbacks[event]:
                 callback(value)
         else:
-            print("Tried to emit event with no external listeners for it")
+            consts.dprint("Tried to emit event with no external" +
+                          " listeners for it", 1)
 
     def add_event_callback(self, event, callback):
         if event in self._event_callbacks:
             self._event_callbacks[event].append(callback)
         else:
-            print("Tried to add callback to nonexistent UI event")
+            consts.dprint("Tried to add callback to nonexistent UI event", 1)
+
+    def add_event_handler(self, event, handler):
+        if event in self._event_listeners:
+            self._event_listeners[event].append(handler)
+        else:
+            consts.dprint("Tried to add handler for nonexistent outside event",
+                          1)
 
     def respond_event(self, event, value):
         """
