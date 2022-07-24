@@ -29,16 +29,27 @@ LAST_KEY_HANDLED = (
     True  # indicates whether or not the latest key input has been handled
 )
 
+BINDINGS = {}
 
-def init_bindings(root):
+
+def init_bindings(root, clicker):
     """
     Initializes some bindings for the main program
+    @args
+    - root: the root tkinter widget
+    - clicker: the clicker object
     """
+    global BINDINGS
     # we need to use pynput listener b/c tkinter only listens for inputs when
     # focused on its window
     root.protocol(
         "WM_DELETE_WINDOW", handle_quit
     )  # end custom mainloop when press close btn
+
+    BINDINGS = {
+        consts.KEY_R: clicker.toggle_clicking,
+        consts.KEY_ESC: handle_quit,
+    }
 
 
 def init_kb_listener():
@@ -97,7 +108,7 @@ def main():
 
     clickerObject = clicker.Clicker()
     clickerObject.add_callback_to_active_change(
-        lambda state: update_texts(ui, state)
+        lambda state: ui.respond_event("active_change", state)
     )
 
     # set up events going between
@@ -110,12 +121,7 @@ def main():
     # lmb or rmb click type change
     ui.add_event_callback("click_type_change", clickerObject.update_click_btn)
 
-    bindings = {
-        consts.KEY_R: clickerObject.toggle_clicking,
-        consts.KEY_ESC: handle_quit,
-    }
-
-    init_bindings(root)
+    init_bindings(root, clickerObject)
     init_kb_listener()
 
     while PROGRAM_RUNNING:
@@ -123,7 +129,7 @@ def main():
         # callback from pynput keyboard handler call tkinter object methods
         # need to do it manually back here in the main loop
         if not LAST_KEY_HANDLED:
-            handle_key(LAST_KEY, bindings)
+            handle_key(LAST_KEY, BINDINGS)
             LAST_KEY_HANDLED = True
 
         # split tkinter main loop b/c need to loop the clicker in as well
