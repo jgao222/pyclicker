@@ -107,6 +107,8 @@ def main():
     ui.add_event_callback("window_change", clickerObject.update_window)
     # add position change
     ui.add_event_callback("click_pos_change", clickerObject.update_click_point)
+    # lmb or rmb click type change
+    ui.add_event_callback("click_type_change", clickerObject.update_click_btn)
 
     bindings = {
         consts.KEY_R: clickerObject.toggle_clicking,

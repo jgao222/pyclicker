@@ -24,6 +24,8 @@ class Clicker:
         self._click_at_point = False
         self._point_to_click = (None, None)
 
+        self._click_button = "left"
+
     def update_cps(self, click_speed=consts.DEFAULT_CPS):
         self._cps = click_speed
 
@@ -50,6 +52,14 @@ class Clicker:
         consts.dprint("Updated point to click at to be: " +
                       f"{self._point_to_click}", 2)
 
+    def update_click_btn(self, btn="left"):
+        """
+        Update the click type
+        @args
+        - type: 'left' or 'right'
+        """
+        self._click_button = btn
+
     def adjust_speed(self):
         if self._click_counter and self._seconds_counter:
             if (self._click_counter / self._seconds_counter) < self._cps:
@@ -64,7 +74,8 @@ class Clicker:
     def do_clicking(self):
         if self.should_click():
             pyautogui.click(x=self._point_to_click[0],
-                            y=self._point_to_click[1])
+                            y=self._point_to_click[1],
+                            button=self._click_button)
 
             self._click_counter += 1
             cur_time = time.perf_counter()
@@ -78,7 +89,8 @@ class Clicker:
             self._time_last = 0
 
     def toggle_clicking(self):
-        print("clicking toggled to " + str(not self._active))
+        consts.dprint("clicking toggled to " + str(not self._active) +
+                      f" at {self._cps} for {self._click_button} button", 2)
         self._active = not self._active
 
         self.change_in_active_state()

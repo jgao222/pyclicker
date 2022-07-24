@@ -9,6 +9,7 @@ import gui.activity_label as activity_label
 import gui.slider as slider
 import gui.window_selector as window_selector
 import gui.point_selector as point_selector
+import gui.button_selector as button_selector
 
 
 class MainGui(tk.Frame):
@@ -22,6 +23,7 @@ class MainGui(tk.Frame):
                 ("cps_change", list()),
                 ("window_change", list()),
                 ("click_pos_change", list()),
+                ("click_type_change", list()),
             ]
         )
 
@@ -54,17 +56,29 @@ class MainGui(tk.Frame):
         # labelframe containing options
         options_frame = ttk.LabelFrame(self, text="Options")
 
+        # click type selector for LMB or RMB (left/right mouse buttons)
+        self._btn_selection = button_selector.ButtonSelector(options_frame)
+        self._btn_selection.set_callback(
+            lambda new_btn: self.emit_event("click_type_change", new_btn)
+        )
+        self._btn_selection.grid(row=0, column=0, sticky="n",
+                                 padx="20 0")
+
+        # separator for button and window selector
+        sep3 = ttk.Separator(options_frame, orient="horizontal")
+        sep3.grid(row=1, column=0, columnspan=2, padx="20 20", pady="20 20",
+                  sticky="ew")
+
         # a dropdown (combobox) showcasing open windows
         window_selection = window_selector.WindowSelector(options_frame)
         window_selection.set_callback(
             lambda new_window: self.emit_event("window_change", new_window)
         )
-        window_selection.grid(row=0, column=0, columnspan=3, padx="20 20",
-                              pady="20 0")
+        window_selection.grid(row=2, column=0, columnspan=2, padx="20 20")
 
         # separator to divide window and point selectors
-        sep3 = ttk.Separator(options_frame, orient="horizontal")
-        sep3.grid(row=1, column=0, columnspan=3, padx="20 20", pady="20 20",
+        sep4 = ttk.Separator(options_frame, orient="horizontal")
+        sep4.grid(row=3, column=0, columnspan=2, padx="20 20", pady="20 20",
                   sticky="ew")
 
         # point selector for where to click
@@ -73,9 +87,8 @@ class MainGui(tk.Frame):
         self._point_selection.set_callback(
             lambda new_point: self.emit_event("click_pos_change", new_point)
         )
-        self._point_selection.grid(row=2, column=0, padx="20 0", pady="0 20",
-                                   sticky="w")
-        # the minute amount fo padding here prevents drawing over the border
+        self._point_selection.grid(row=4, column=0, padx="20 0",
+                                   sticky="nw")
 
         options_frame.grid(row=0, column=3, rowspan=5, sticky="nsew")
 
