@@ -67,7 +67,7 @@ class MainGui(tk.Frame):
         self._btn_selection.set_callback(
             lambda new_btn: self.emit_event("click_type_change", new_btn)
         )
-        self._btn_selection.grid(row=0, column=0, sticky="n",
+        self._btn_selection.grid(row=0, column=0, columnspan=2,
                                  padx="20 0")
 
         # separator for button and window selector

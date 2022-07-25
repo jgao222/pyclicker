@@ -9,7 +9,7 @@ class ButtonSelector(ttk.Frame):
 
         # a label to indicate the option
         click_label = ttk.Label(self, text="Click Type: ")
-        click_label.grid(row=0, column=0, sticky="w", padx="0 0")
+        click_label.grid(row=0, column=0, padx="0 0")
 
         self._mode = tk.StringVar()
         self._mode.set("left")

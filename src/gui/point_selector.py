@@ -25,7 +25,7 @@ class PointSelector(ttk.Frame):
         # radio between clicking at cursor and at set point
         cursor_option = ttk.Radiobutton(self, text="Cursor",
                                         variable=self._mode, value="CURSOR")
-        point_option = ttk.Radiobutton(self, text="Set Point",
+        point_option = ttk.Radiobutton(self, text="Position",
                                        variable=self._mode, value="POINT")
         cursor_option.grid(row=1, column=0, sticky="w",
                            padx="40 0", pady="5 0")
@@ -43,7 +43,8 @@ class PointSelector(ttk.Frame):
         self._COORD_ENTRY = ttk.Entry(self, textvariable=self._COORD_TEXT,
                                       validate="all",
                                       validatecommand=check_valid_wrapper,
-                                      state="disabled")
+                                      state="disabled",
+                                      width=12)
         self._COORD_ENTRY.grid(row=3, column=0, pady="0 10", padx="50 5")
 
         self._point_set_btn = ttk.Button(self, text="Set Point",
@@ -55,7 +56,7 @@ class PointSelector(ttk.Frame):
         self._set_pt_info_label = ttk.Label(
             self, text="Click again to set click position",
             foreground="grey60")
-        self._set_pt_info_label.grid(row=2, column=1, sticky="s", pady="0 10")
+        self._set_pt_info_label.grid(row=2, column=1, sticky="sw", pady="0 5")
         self._set_pt_info_label.grid_remove()
 
     def handle_mode_change(self, *args):
