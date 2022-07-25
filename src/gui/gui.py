@@ -93,6 +93,11 @@ class MainGui(tk.Frame):
         self._point_selection.set_callback(
             lambda new_point: self.emit_event("click_pos_change", new_point)
         )
+        self._point_selection.set_btn_callback(
+            lambda: self.emit_event("request_set_click_position", None))
+        self.add_event_handler(
+            "set_click_position",
+            self._point_selection.handle_external_set_coords)
         self._point_selection.grid(row=4, column=0, padx="20 0",
                                    sticky="nw")
 

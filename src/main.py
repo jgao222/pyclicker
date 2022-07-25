@@ -28,11 +28,13 @@ LAST_KEY = None
 LAST_KEY_HANDLED = (
     True  # indicates whether or not the latest key input has been handled
 )
+LAST_CLICK_POS = None
+LAST_CLICK_HANDLED = True
 
 BINDINGS = {}
 
 
-def init_bindings(root, clicker):
+def init_bindings(root, ui, clicker):
     """
     Initializes some bindings for the main program
     @args
@@ -49,6 +51,7 @@ def init_bindings(root, clicker):
     BINDINGS = {
         consts.KEY_R: clicker.toggle_clicking,
         consts.KEY_ESC: handle_quit,
+        "SET_CLICK_POINT": lambda x, y, _1, _2: ui.respon
     }
 
 
@@ -84,12 +87,22 @@ def watch_next_click(callback):
                 - x, y are screen coordinates, button is which button,
                   pressed is a boolean representing pressed down or not
     """
-    listener = pynput.mouse.Listener(on_click=callback)
+    global LAST_CLICK_POS
+    consts.dprint("watching for next click", 2)
+
+    def handle_click(x, y, button, pressed):
+        global LAST_CLICK_POS, LAST_CLICK_HANDLED
+        if not pressed:  # on release of mouse button
+            LAST_CLICK_POS = (x, y)
+            LAST_CLICK_HANDLED = False
+            consts.dprint(LAST_CLICK_POS, 2)
+            return False  # stop listening
+    listener = pynput.mouse.Listener(on_click=handle_click)
     listener.start()
 
 
 def main():
-    global LAST_KEY_HANDLED
+    global LAST_KEY_HANDLED, LAST_CLICK_HANDLED
 
     root = tk.Tk()
     sv_ttk.set_theme("light")
@@ -129,11 +142,9 @@ def main():
     # lmb or rmb click type change
     ui.add_event_callback("click_type_change", clickerObject.update_click_btn)
     # request to set click position
-    ui.add_event_callback("request_set_click_position", watch_next_click(
-        lambda x, y, _1, _2: ui.respond_event("set_click_position", (x, y))
-    ))
+    ui.add_event_callback("request_set_click_position", watch_next_click)
 
-    init_bindings(root, clickerObject)
+    init_bindings(root, ui, clickerObject)
     init_kb_listener()
 
     while PROGRAM_RUNNING:
@@ -143,6 +154,10 @@ def main():
         if not LAST_KEY_HANDLED:
             handle_key(LAST_KEY, BINDINGS)
             LAST_KEY_HANDLED = True
+
+        if not LAST_CLICK_HANDLED:
+            ui.respond_event("set_click_position", LAST_CLICK_POS)
+            LAST_CLICK_HANDLED = True
 
         # split tkinter main loop b/c need to loop the clicker in as well
         root.update_idletasks()

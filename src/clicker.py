@@ -49,7 +49,7 @@ class Clicker:
         """
         self._point_to_click = target_point
         self._click_at_point = target_point[0] and target_point[1]
-        consts.dprint("Updated point to click at to be: " +
+        consts.dprint("CLICKER: Updated point to click at to be: " +
                       f"{self._point_to_click}", 2)
 
     def update_click_btn(self, btn="left"):

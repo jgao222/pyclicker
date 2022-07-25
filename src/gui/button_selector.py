@@ -21,9 +21,6 @@ class ButtonSelector(ttk.Frame):
         left.grid(row=0, column=1, padx="10 0", pady="5 0")
         right.grid(row=0, column=2, padx="10 0", pady="5 0")
 
-        self._point_set_btn = ttk.Button(self, text="Set Point")
-        self._point_set_btn.grid(row=1, column=1)
-
         self._mode.trace_add("write", self.handle_mode_change)
 
     def handle_mode_change(self, *args):
@@ -31,6 +28,3 @@ class ButtonSelector(ttk.Frame):
 
     def set_callback(self, callback):
         self._callback = callback
-
-    def set_btn_callback(self, btn_callback):
-        self._point_set_btn.configure(command=btn_callback)

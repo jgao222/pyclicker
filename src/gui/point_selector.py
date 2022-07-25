@@ -46,15 +46,29 @@ class PointSelector(ttk.Frame):
                                       state="disabled")
         self._COORD_ENTRY.grid(row=3, column=0, pady="0 10", padx="50 5")
 
+        self._point_set_btn = ttk.Button(self, text="Set Point",
+                                         command=self.handle_set_btn_pressed,
+                                         state="disabled")
+        self._point_set_btn.grid(row=3, column=1, padx="10 0",
+                                 pady="0 10", sticky="sw")
+
+        self._set_pt_info_label = ttk.Label(
+            self, text="Click again to set click position",
+            foreground="grey60")
+        self._set_pt_info_label.grid(row=2, column=1, sticky="s", pady="0 10")
+        self._set_pt_info_label.grid_remove()
+
     def handle_mode_change(self, *args):
         # surely this is only called after the value is updated right?
         consts.dprint("called handle_mode_change", 2)
         match self._mode.get():
             case "CURSOR":  # should grey out the point selection stuff
                 self._COORD_ENTRY.configure(state="disabled")
+                self._point_set_btn.configure(state="disabled")
                 self._callback((None, None))
             case "POINT":
                 self._COORD_ENTRY.configure(state="normal")
+                self._point_set_btn.configure(state="normal")
                 self._callback((self._x, self._y))
 
     def handle_text_update(self, *args):
@@ -70,3 +84,16 @@ class PointSelector(ttk.Frame):
         consts.dprint(f"called check_valid_coords: {newval}")
         valid = re.match('^\\([0-9]*,\\s?[0-9]*\\)$', newval) is not None
         return valid
+
+    def set_btn_callback(self, btn_callback):
+        self._point_set_btn_callback = btn_callback
+
+    def handle_set_btn_pressed(self):
+        self._set_pt_info_label.grid()
+        if self._point_set_btn_callback:
+            self._point_set_btn_callback()
+
+    def handle_external_set_coords(self, point):
+        # hopefully this calls the callbacks that normally setting it would
+        self._COORD_TEXT.set(f"({point[0]}, {point[1]})")
+        self._set_pt_info_label.grid_remove()
