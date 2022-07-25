@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-import win32gui
+import win32.win32gui as win32gui
 import consts
 
 
@@ -16,7 +16,7 @@ class WindowSelector(tk.Frame):
         super().__init__(parent)
 
         self._title = ttk.Label(self, text="Click in:")
-        self._title.grid(row=0, column=0, padx="20 10")
+        self._title.grid(row=0, column=0, padx="0 5")
 
         self._selected_text = tk.StringVar()
         self._selected_text.set("Anywhere")
@@ -43,7 +43,7 @@ class WindowSelector(tk.Frame):
             state="readonly",
             command=self.refresh_selection_list
         )
-        refresh_button.grid(row=0, column=2)
+        refresh_button.grid(row=0, column=2, padx="10 0")
 
     def _update(self):
         print("selector updated")
