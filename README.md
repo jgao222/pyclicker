@@ -1,6 +1,6 @@
 ## Python Clicking Script
 
-This is a simple script for an autoclicker, made in Python.
+This is an autoclicker for Windows, written in Python.
 
 It uses `pynput` for detecting keyboard input and `pyautogui` for sending clicks.
 
@@ -10,7 +10,7 @@ Currently sets `R` key to toggle clicking, `ESC` as a general failsafe to exit t
 
 ### To Run
 
-You will need `pipenv`: execute `pipenv install` then run the program with `pipenv run pyclick.pyw`. Alternatively, use `run.bat` (on Windows).
+You will need `pipenv`: execute `pipenv install` then run the program with `pipenv run pyclick.pyw`. Alternatively, use `run.bat`.
 
 
 ### GUI
