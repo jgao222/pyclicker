@@ -11,6 +11,8 @@ Currently sets `R` key to toggle clicking, `ESC` as a general failsafe to exit t
 
 ### GUI
 
+<img src="./assets/gui.png" alt="The programs graphical user interface" width="500px">
+
 The clicking speed (clicks per second) can be set from 0.1 to 50 via the slider, in steps of 0.1
 
 The GUI also supports selecting a specific window that the clicker should be active in.
